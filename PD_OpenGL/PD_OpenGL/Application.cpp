@@ -6,6 +6,31 @@
 #include <fstream>
 #include <sstream>
 
+#define ASSERT(x) if(!(x)) __debugbreak(); //__debugbreak() VS exclusive
+#define GLCall(x) GLClearErrors();\
+	x;\
+	ASSERT(GLLogCall(#x, __FILE__, __LINE__))
+
+static void GLClearErrors() 
+{
+	while (glGetError() != GL_NO_ERROR);
+}
+
+static bool GLLogCall(const char* function, const char* file, int line)
+{
+	while (GLenum error = glGetError())
+	{
+		std::cout <<"OpenGL Error: ("<< error << ")" 
+			<< function << " "
+			<< file << ":"
+			<< line << ":"
+			<< std::endl;
+		return false;
+	}
+
+	return true;
+}
+
 struct ShaderProgramSource
 {
 	std::string VertexShaderSource;
@@ -120,32 +145,33 @@ int main(void)
 	};
 
 	unsigned int bufferId;
-	glGenBuffers(1, &bufferId);
-	glBindBuffer(GL_ARRAY_BUFFER, bufferId);
-	glBufferData(GL_ARRAY_BUFFER, 6 * 2 * sizeof(float), positions, GL_STATIC_DRAW);
+	GLCall(glGenBuffers(1, &bufferId));
+	GLCall(glBindBuffer(GL_ARRAY_BUFFER, bufferId));
+	GLCall(glBufferData(GL_ARRAY_BUFFER, 6 * 2 * sizeof(float), positions, GL_STATIC_DRAW));
 
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
-	glEnableVertexAttribArray(0);
+	GLCall(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0));
+	GLCall(glEnableVertexAttribArray(0));
 
 	unsigned int ibo;
-	glGenBuffers(1, &ibo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indices, GL_STATIC_DRAW);
+	GLCall(glGenBuffers(1, &ibo));
+	GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo));
+	GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indices, GL_STATIC_DRAW));
 
 	ShaderProgramSource shaderSource = ParseShader("res/shaders/Base.shader");
 	unsigned int shader = CreateShader(shaderSource.VertexShaderSource, shaderSource.FragmentShaderSource);
-	glUseProgram(shader);
+	GLCall(glUseProgram(shader));
 
 	while (!glfwWindowShouldClose(window))
 	{
 		glClear(GL_COLOR_BUFFER_BIT);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+	
+		GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
 
-	glDeleteProgram(shader);
+	GLCall(glDeleteProgram(shader));
 
 	glfwTerminate();
 	return 0;
