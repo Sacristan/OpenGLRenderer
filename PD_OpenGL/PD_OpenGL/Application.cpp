@@ -71,15 +71,19 @@ int main(void)
 		layout.Push<float>(2);
 		va.AddBuffer(vb, layout);
 
- 		IndexBuffer ib(indices, 6);
-		
+		IndexBuffer ib(indices, 6);
+
 		//glm::mat4 proj = glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f, -1.0f, 1.0f);
 		glm::mat4 proj = glm::ortho(0.0f, (float)ResolutionX, 0.0f, (float)ResolutionY, -1.0f, 1.0f); //per pixel projection matrix
+		glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(-100, 0, 0));
+		glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(200, 200, 0));
+
+		glm::mat4 mvp = proj * view * model;
 
 		Shader shader("res/shaders/Base.shader");
 		shader.Bind();
 		shader.SetUniform4f("_Color", 1.0f, 1.0f, 1.0f, 1.0f);
-		shader.SetUniformMatrix4f("_MVP", proj);
+		shader.SetUniformMatrix4f("_MVP", mvp);
 
 		Texture texture("res/textures/shotty.png");
 		texture.Bind();
