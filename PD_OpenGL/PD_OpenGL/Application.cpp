@@ -13,6 +13,7 @@
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+#include <ctime>
 
 const int ResolutionX = 640;
 const int ResolutionY = 480;
@@ -46,10 +47,10 @@ int main(void)
 	std::cout << "OpenGL v" << glGetString(GL_VERSION) << std::endl;
 	{
 		float positions[] = {
-			100.0f, 100.0f, 0.0f, 0.0f,
-			200.f, 100.0f, 1.0f, 0.0f,
-			200.0f, 200.0f, 1.0f, 1.0f,
-			100.0f, 200.0f, .0f, 1.0f
+			100.0f, 100.0f, 2.0f, 0.0f, 0.0f,
+			200.f, 100.0f, 3.0f, 1.0f, 0.0f,
+			200.0f, 200.0f, 1.0f, 1.0f, 1.0f,
+			100.0f, 200.0f, 2.0f, 1.0f, 1.0f
 		};
 
 		unsigned int indices[] = {
@@ -57,33 +58,34 @@ int main(void)
 			2, 3, 0
 		};
 
-		GLCall(glEnable(GL_BLEND));
-		GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+		//GLCall(glEnable(GL_BLEND));
+		//GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
 		unsigned int vao;
 		GLCall(glGenVertexArrays(1, &vao));
 		GLCall(glBindVertexArray(vao));
 
 		VertexArray va;
-		VertexBuffer vb(positions, 4 * 4 * sizeof(float));
+		VertexBuffer vb(positions, 4 * 5 * sizeof(float));
 		VertexBufferLayout layout;
-		layout.Push<float>(2);
+		layout.Push<float>(3);
 		layout.Push<float>(2);
 		va.AddBuffer(vb, layout);
 
 		IndexBuffer ib(indices, 6);
 
 		//glm::mat4 proj = glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f, -1.0f, 1.0f);
-		glm::mat4 proj = glm::ortho(0.0f, (float)ResolutionX, 0.0f, (float)ResolutionY, -1.0f, 1.0f); //per pixel projection matrix
-		glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(-100, 0, 0));
-		glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(200, 200, 0));
+		glm::mat4 proj = glm::ortho(0.0f, (float)ResolutionX, 0.0f, (float)ResolutionY, -100.0f, 100.0f); //per pixel projection matrix
+		glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
+		view = glm::rotate(view, 45 * 0.017453292f, glm::vec3(0, 1, 0));
 
-		glm::mat4 mvp = proj * view * model;
+		glm::mat4 model = glm::mat4(1.0f);
+
+		//glm::vec3(sin(std::time(nullptr)) * 5
 
 		Shader shader("res/shaders/Base.shader");
 		shader.Bind();
 		shader.SetUniform4f("_Color", 1.0f, 1.0f, 1.0f, 1.0f);
-		shader.SetUniformMatrix4f("_MVP", mvp);
 
 		Texture texture("res/textures/shotty.png");
 		texture.Bind();
@@ -102,9 +104,12 @@ int main(void)
 		while (!glfwWindowShouldClose(window))
 		{
 			renderer.Clear();
+			
+			glm::mat4 mvp = proj * view * model;
 
 			shader.Bind();
 			shader.SetUniform4f("_Color", r, 0.25f, 1.0f, 1.0f);
+			shader.SetUniformMatrix4f("_MVP", mvp);
 
 			va.Bind();
 			ib.Bind();
