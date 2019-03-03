@@ -11,6 +11,9 @@
 #include "Shader.h"
 #include "Texture.h"
 
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+
 int main(void)
 {
 	GLFWwindow* window;
@@ -66,10 +69,13 @@ int main(void)
 		va.AddBuffer(vb, layout);
 
  		IndexBuffer ib(indices, 6);
+		
+		glm::mat4 proj = glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f, -1.0f, 1.0f);
 
 		Shader shader("res/shaders/Base.shader");
 		shader.Bind();
 		shader.SetUniform4f("_Color", 1.0f, 1.0f, 1.0f, 1.0f);
+		shader.SetUniformMatrix4f("_MVP", proj);
 
 		Texture texture("res/textures/shotty.png");
 		texture.Bind();
