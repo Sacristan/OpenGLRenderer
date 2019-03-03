@@ -14,6 +14,9 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
+const int ResolutionX = 640;
+const int ResolutionY = 480;
+
 int main(void)
 {
 	GLFWwindow* window;
@@ -25,7 +28,7 @@ int main(void)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	window = glfwCreateWindow(640, 480, "...OpenGL Magick...", NULL, NULL);
+	window = glfwCreateWindow(ResolutionX, ResolutionY, "...OpenGL Magick...", NULL, NULL);
 	if (!window)
 	{
 		glfwTerminate();
@@ -43,10 +46,10 @@ int main(void)
 	std::cout << "OpenGL v" << glGetString(GL_VERSION) << std::endl;
 	{
 		float positions[] = {
-			-.5f, -.5, .0f, .0f,
-			.5f, -.5f, 1.0f, .0f,
-			.5f, .5f, 1.0f, 1.0f,
-			-.5f, .5f, .0f, 1.0f 
+			100.0f, 100.0f, 0.0f, 0.0f,
+			200.f, 100.0f, 1.0f, 0.0f,
+			200.0f, 200.0f, 1.0f, 1.0f,
+			100.0f, 200.0f, .0f, 1.0f
 		};
 
 		unsigned int indices[] = {
@@ -70,7 +73,8 @@ int main(void)
 
  		IndexBuffer ib(indices, 6);
 		
-		glm::mat4 proj = glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f, -1.0f, 1.0f);
+		//glm::mat4 proj = glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f, -1.0f, 1.0f);
+		glm::mat4 proj = glm::ortho(0.0f, (float)ResolutionX, 0.0f, (float)ResolutionY, -1.0f, 1.0f); //per pixel projection matrix
 
 		Shader shader("res/shaders/Base.shader");
 		shader.Bind();
