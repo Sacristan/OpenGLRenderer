@@ -24,6 +24,25 @@
 const int ResolutionX = 640;
 const int ResolutionY = 480;
 
+template<typename T> struct PingPongValue {
+	T value, min, max, speed, dir{ 1 };
+
+	PingPongValue(T mMin, T mMax, T mSpeed)
+		: value(mMin), min(mMin), max(mMax), speed(mSpeed) { }
+
+	void step()
+	{
+		// allowing over-/underflow
+		value += speed * dir;
+
+		// clamp
+		value += (min - value)*(value < min) + (max - value)*(value > max);
+
+		// set dir
+		dir += 2 * ((value == min) - (value == max));
+	}
+};
+
 //3 pos 2 texcoord
 GLfloat cube_vertex_data[] = {
 	// front
@@ -58,8 +77,6 @@ GLuint cube_indices[] = {
 	3, 2, 6,
 	6, 7, 3
 };
-
-void DrawCube(GLfloat centerPosX, GLfloat centerPosY, GLfloat centerPosZ, GLfloat edgeLength);
 
 int main(void)
 {
@@ -108,11 +125,6 @@ int main(void)
 
 		glm::vec3 pos = glm::vec3(0.0, 0.0, -4.0);
 
-		glm::mat4 projection = glm::perspective(glm::radians(45.0f), 1.0f * (float)ResolutionX / (float)ResolutionY, 0.1f, 50.0f);
-		glm::mat4 view = glm::lookAt(glm::vec3(0.0, 2.0, 0.0), pos, glm::vec3(0.0, 1.0, 0.0));
-		glm::mat4 model = glm::translate(glm::mat4(1.0f), pos);
-
-
 		Shader shader("res/shaders/Base.shader");
 		shader.Bind();
 		shader.SetUniform4f("_Color", 1.0f, 1.0f, 1.0f, 1.0f);
@@ -132,6 +144,8 @@ int main(void)
 		float angle = 0;
 		float rotationSpeed = 0.1f;
 
+		PingPongValue<double> fovPingPong = PingPongValue<double>(45.0, 120.0, 0.25f);
+
 		Renderer renderer;
 
 		while (!glfwWindowShouldClose(window))
@@ -139,8 +153,16 @@ int main(void)
 			float deltaTime = clock() - lastFrameTime;
 			renderer.Clear();
 			
+			//float fov = PingPongValue(45.0f, 120.0f, deltaTime());
+			fovPingPong.step();
+			float fov = (float)fovPingPong.value;
+			glm::mat4 projection = glm::perspective(glm::radians(fov), 1.0f * (float)ResolutionX / (float)ResolutionY, 0.1f, 50.0f); //world2screen matrix
+			glm::mat4 view = glm::lookAt(glm::vec3(0.0, 2.0, 0.0), pos, glm::vec3(0.0, 1.0, 0.0)); //camera matrix
+			glm::mat4 model = glm::translate(glm::mat4(1.0f), pos); //object matrix
+
 			angle += deltaTime* rotationSpeed;
 			glm::vec3 axis_y(0, 1, 0);
+
 			glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(angle), axis_y);
 			//glm::mat4 rotationMatrix = glm::mat4(1.0f);
 
