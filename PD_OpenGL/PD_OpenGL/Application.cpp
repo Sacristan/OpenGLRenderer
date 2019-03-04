@@ -52,9 +52,9 @@ GLfloat cube_vertex_data[] = {
 	-1.0,  1.0,  1.0, 0.0, 1.0,
 	// back
 	-1.0, -1.0, -1.0, 0.0, 0.0,
-	 1.0, -1.0, -1.0, 0.0, 0.0,
-	 1.0,  1.0, -1.0, 0.0, 0.0,
-	-1.0,  1.0, -1.0, 0.0, 0.0,
+	 1.0, -1.0, -1.0, 1.0, 0.0,
+	 1.0,  1.0, -1.0, 1.0, 1.0,
+	-1.0,  1.0, -1.0, 0.0, 1.0,
 };
 
 GLuint cube_indices[] = {
@@ -163,10 +163,10 @@ int main(void)
 			angle += deltaTime* rotationSpeed;
 			glm::vec3 axis_y(0, 1, 0);
 
-			glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(angle), axis_y);
+			glm::mat4 modelRotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(angle), axis_y);
 			//glm::mat4 rotationMatrix = glm::mat4(1.0f);
 
-			glm::mat4 mvp = projection * view * model * rotationMatrix;
+			glm::mat4 mvp = projection * view * model * modelRotationMatrix;
 
 			shader.Bind();
 			shader.SetUniform4f("_Color", r, 0.25f, 1.0f, 1.0f);
