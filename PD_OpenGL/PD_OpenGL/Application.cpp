@@ -18,40 +18,22 @@
 const int ResolutionX = 640;
 const int ResolutionY = 480;
 
-//static const float cube_vertex_buffer_data[] = {
-//
-//
-//
-//};
 
-
-GLfloat cube_vertices[] = {
+//3 pos 2 texcoord
+GLfloat cube_vertex_data[] = {
 	// front
-	-1.0, -1.0,  1.0,
-	 1.0, -1.0,  1.0,
-	 1.0,  1.0,  1.0,
-	-1.0,  1.0,  1.0,
+	-1.0, -1.0,  1.0, 0.0, 0.0,
+	 1.0, -1.0,  1.0, 0.0, 0.0,
+	 1.0,  1.0,  1.0, 0.0, 0.0,
+	-1.0,  1.0,  1.0, 0.0, 0.0,
 	// back
-	-1.0, -1.0, -1.0,
-	 1.0, -1.0, -1.0,
-	 1.0,  1.0, -1.0,
-	-1.0,  1.0, -1.0
+	-1.0, -1.0, -1.0, 0.0, 0.0,
+	 1.0, -1.0, -1.0, 0.0, 0.0,
+	 1.0,  1.0, -1.0, 0.0, 0.0,
+	-1.0,  1.0, -1.0, 0.0, 0.0,
 };
 
-GLfloat cube_colors[] = {
-	// front colors
-	1.0, 0.0, 0.0,
-	0.0, 1.0, 0.0,
-	0.0, 0.0, 1.0,
-	1.0, 1.0, 1.0,
-	// back colors
-	1.0, 0.0, 0.0,
-	0.0, 1.0, 0.0,
-	0.0, 0.0, 1.0,
-	1.0, 1.0, 1.0
-};
-
-GLuint cube_elements[] = {
+GLuint cube_indices[] = {
 	// front
 	0, 1, 2,
 	2, 3, 0,
@@ -71,48 +53,6 @@ GLuint cube_elements[] = {
 	3, 2, 6,
 	6, 7, 3
 };
-
-//static const float cube_vertex_buffer[] = {
-//	//front
-//	-1.0, -1.0, 1.0, 0.0f, 0.0f,
-//	 1.0, -1.0, 1.0, 0.0f, 0.0f,
-//	 1.0, 1.0, 1.0, 0.0f, 0.0f,
-//	-1.0, 1.0, 1.0, 0.0f, 0.0f,
-//	//right
-//	1.0, 1.0, 1.0, 0.0f, 0.0f,
-//	1.0, 1.0, -1.0, 0.0f, 0.0f,
-//	1.0, -1.0, -1.0, 0.0f, 0.0f,
-//	1.0, -1.0, 1.0, 0.0f, 0.0f,
-//	//back
-//	-1.0, -1.0, -1.0, 0.0f, 0.0f,
-//	 1.0, -1.0, -1.0, 0.0f, 0.0f,
-//	 1.0, 1.0, -1.0, 0.0f, 0.0f,
-//	-1.0, 1.0, -1.0, 0.0f, 0.0f,
-//	//left
-//	-1.0, -1.0, -1.0, 0.0f, 0.0f,
-//	-1.0, -1.0, 1.0, 0.0f, 0.0f,
-//	-1.0, 1.0, 1.0, 0.0f, 0.0f,
-//	-1.0, 1.0, -1.0, 0.0f, 0.0f,
-//	//upper
-//	1.0, 1.0, 1.0, 0.0f, 0.0f,
-//	-1.0, 1.0, 1.0, 0.0f, 0.0f,
-//	-1.0, 1.0, -1.0, 0.0f, 0.0f,
-//	 1.0, 1.0, -1.0, 0.0f, 0.0f,
-//	 //bottom
-//	-1.0, -1.0, -1.0, 0.0f, 0.0f,
-//	 1.0, -1.0, -1.0, 0.0f, 0.0f,
-//	 1.0, -1.0, 1.0, 0.0f, 0.0f,
-//	-1.0, -1.0, 1.0, 0.0f, 0.0f,
-//};
-//
-//static const unsigned int cube_indices[] = {
-//	0, 1, 2, 0, 2, 3, //front
-//	4, 5, 6, 4, 6, 7, //right
-//	8, 9, 10, 8, 10, 11, //back
-//	12, 13, 14, 12, 14, 15, //left
-//	16, 17, 18, 16, 18, 19, //upper
-//	20, 21, 22, 20, 22, 23 //bottom
-//};
 
 void DrawCube(GLfloat centerPosX, GLfloat centerPosY, GLfloat centerPosZ, GLfloat edgeLength);
 
@@ -153,25 +93,20 @@ int main(void)
 		GLCall(glBindVertexArray(vao));
 
 		VertexArray va;
-		VertexBuffer vb(cube_vertices, 24 * 3 * sizeof(float));
+		VertexBuffer vb(cube_vertex_data, 24 * 3 * sizeof(float));
 		VertexBufferLayout layout;
 		layout.Push<float>(3);
-		//layout.Push<float>(2);
+		layout.Push<float>(2);
 		va.AddBuffer(vb, layout);
 
-		IndexBuffer ib(cube_elements, 36);
+		IndexBuffer ib(cube_indices, 36);
 
-		//glm::mat4 proj = glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f, -100.0f, 100.0f);
-		//glm::mat4 proj = glm::ortho(0.0f, (float)ResolutionX, 0.0f, (float)ResolutionY, 0.0f, 0.0f); //per pixel projection matrix
+		glm::vec3 pos = glm::vec3(0.0, 0.0, -4.0);
+
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f), 1.0f * (float)ResolutionX / (float)ResolutionY, 0.1f, 50.0f);
-		//glm::mat4 view = glm::mat4(1.0f);
-		glm::mat4 view = glm::lookAt(glm::vec3(0.0, 2.0, 0.0), glm::vec3(0.0, 0.0, -4.0), glm::vec3(0.0, 1.0, 0.0));
-		//view = glm::rotate(view, 45 * 0.017453292f, glm::vec3(0, 1, 0));
-		glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0, 0.0, -4.0));
+		glm::mat4 view = glm::lookAt(glm::vec3(0.0, 2.0, 0.0), pos, glm::vec3(0.0, 1.0, 0.0));
+		glm::mat4 model = glm::translate(glm::mat4(1.0f), pos);
 
-		glm::mat4 mvp = projection * view * model;
-		
-		//glm::vec3(sin(std::time(nullptr)) * 5
 
 		Shader shader("res/shaders/Base.shader");
 		shader.Bind();
@@ -188,12 +123,23 @@ int main(void)
 
 		float r = 0.0f;
 		float increment = 0.05f;
+		double lastFrameTime = clock();
+		float angle = 0;
+		float rotationSpeed = 0.1f;
 
 		Renderer renderer;
 
 		while (!glfwWindowShouldClose(window))
 		{
+			float deltaTime = clock() - lastFrameTime;
 			renderer.Clear();
+			
+			angle += deltaTime* rotationSpeed;
+			glm::vec3 axis_y(0, 1, 0);
+			glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(angle), axis_y);
+			//glm::mat4 rotationMatrix = glm::mat4(1.0f);
+
+			glm::mat4 mvp = projection * view * model * rotationMatrix;
 
 			shader.Bind();
 			shader.SetUniform4f("_Color", r, 0.25f, 1.0f, 1.0f);
@@ -208,9 +154,13 @@ int main(void)
 			else if (r < 0.05f) increment = abs(increment);
 
 			r += increment;
+			//r = sin(clock());
+
+			lastFrameTime = clock();
 
 			glfwSwapBuffers(window);
 			glfwPollEvents();
+
 		}
 	}
 
