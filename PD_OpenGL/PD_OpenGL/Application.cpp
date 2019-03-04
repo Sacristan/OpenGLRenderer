@@ -47,9 +47,9 @@ template<typename T> struct PingPongValue {
 GLfloat cube_vertex_data[] = {
 	// front
 	-1.0, -1.0,  1.0, 0.0, 0.0,
-	 1.0, -1.0,  1.0, 0.0, 0.0,
-	 1.0,  1.0,  1.0, 0.0, 0.0,
-	-1.0,  1.0,  1.0, 0.0, 0.0,
+	 1.0, -1.0,  1.0, 1.0, 0.0,
+	 1.0,  1.0,  1.0, 1.0, 1.0,
+	-1.0,  1.0,  1.0, 0.0, 1.0,
 	// back
 	-1.0, -1.0, -1.0, 0.0, 0.0,
 	 1.0, -1.0, -1.0, 0.0, 0.0,
@@ -106,8 +106,8 @@ int main(void)
 
 	std::cout << "OpenGL v" << glGetString(GL_VERSION) << std::endl;
 	{
-		GLCall(glEnable(GL_BLEND));
-		GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+		//GLCall(glEnable(GL_BLEND));
+		//GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 		GLCall(glEnable(GL_DEPTH_TEST));
 
 		unsigned int vao;
