@@ -1,4 +1,10 @@
-﻿#include <GL/glew.h>
+﻿/* TODO:
+	* Create Cube Factory
+	* Add IMGUI
+	* Support TEXCOORD
+*/
+
+#include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
 #include <iostream>
@@ -17,7 +23,6 @@
 
 const int ResolutionX = 640;
 const int ResolutionY = 480;
-
 
 //3 pos 2 texcoord
 GLfloat cube_vertex_data[] = {
@@ -160,7 +165,6 @@ int main(void)
 
 			glfwSwapBuffers(window);
 			glfwPollEvents();
-
 		}
 	}
 
