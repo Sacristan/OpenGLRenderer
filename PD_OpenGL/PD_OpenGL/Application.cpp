@@ -131,7 +131,6 @@ int main(void)
 
 		IndexBuffer ib(cube_indices, 36);
 
-
 		Shader shader("res/shaders/Base.shader");
 		shader.Bind();
 		shader.SetUniform4f("_Color", 1.0f, 1.0f, 1.0f, 1.0f);
@@ -156,7 +155,7 @@ int main(void)
 		Renderer renderer;
 
 		IMGUI_CHECKVERSION();
-		
+
 		ImGui::CreateContext();
 		ImGui::StyleColorsDark();
 
@@ -166,15 +165,18 @@ int main(void)
 		bool show_demo_window = true;
 		bool show_another_window = false;
 		ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-		
+
+		glm::vec3 cameraPos = glm::vec3(0.0, 2.0, 0.0);
+
 		float fov = 100.0f;
 		float nearClippingPlane = 0.1f;
 		float farClippingPlane = 50.0f;
 
+		float matrixCameraPos[3] = { 0.0, 2.0, 0.0 };
 		float matrixTranslation[3] = { 0, 0, -4.0 };
 		float matrixRotation[3] = { 0, 0, 0 };
 		float matrixScale[3] = { 1.0, 1.0, 1.0 };
-		
+
 		while (!glfwWindowShouldClose(window))
 		{
 			float deltaTime = clock() - lastFrameTime;
@@ -186,7 +188,7 @@ int main(void)
 
 			{
 				ImGui::Begin("Controls");
-			
+
 				ImGui::BeginGroup();
 
 				ImGui::Text("Cube Transform");
@@ -199,6 +201,7 @@ int main(void)
 
 				ImGui::Text("Camera");
 				ImGui::SliderFloat("FOV", &fov, 45.0f, 120.0f);
+				ImGui::InputFloat3("Camera Pos", matrixCameraPos, 3);
 				ImGui::Text("Clipping Planes: ");
 				ImGui::InputFloat("Near", &nearClippingPlane);
 				ImGui::InputFloat("Far", &farClippingPlane);
@@ -214,11 +217,13 @@ int main(void)
 			glm::vec3 rot = glm::vec3(matrixRotation[0], matrixRotation[1], matrixRotation[2]);
 			glm::vec3 scale = glm::vec3(matrixScale[0], matrixScale[1], matrixScale[2]);
 
+			glm::vec3 cameraPos = glm::vec3(matrixCameraPos[0], matrixCameraPos[1], matrixCameraPos[2]);
+
 			glm::mat4 projection = glm::perspective(glm::radians(fov), 1.0f * (float)ResolutionX / (float)ResolutionY, nearClippingPlane, farClippingPlane); //world2screen matrix
-			glm::mat4 view = glm::lookAt(glm::vec3(0.0, 2.0, 0.0), pos, glm::vec3(0.0, 1.0, 0.0)); //camera matrix
+			glm::mat4 view = glm::lookAt(cameraPos, pos, axis_y); //camera matrix 
 
 			glm::mat4 model = glm::mat4(1.0f); //object matrix
-			model = glm::translate(model, pos); 
+			model = glm::translate(model, pos);
 			model = glm::scale(model, scale);
 
 			model = glm::rotate(model, glm::radians(rot.x), axis_x);
