@@ -25,8 +25,8 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include <ctime>
 
-const int ResolutionX = 640;
-const int ResolutionY = 480;
+const int ResolutionX = 800;
+const int ResolutionY = 600;
 
 template<typename T> struct PingPongValue {
 	T value, min, max, speed, dir{ 1 };
@@ -127,7 +127,6 @@ int main(void)
 
 		IndexBuffer ib(cube_indices, 36);
 
-		glm::vec3 pos = glm::vec3(0.0, 0.0, -4.0);
 
 		Shader shader("res/shaders/Base.shader");
 		shader.Bind();
@@ -165,7 +164,15 @@ int main(void)
 		bool show_demo_window = true;
 		bool show_another_window = false;
 		ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+		
+		float fov = 100.0f;
+		float nearClippingPlane = 0.1f;
+		float farClippingPlane = 50.0f;
 
+		float matrixTranslation[3] = { 0, 0, -4.0 };
+		float matrixRotation[3] = { 0, 0, 0 };
+		float matrixScale[3] = { 1.0, 1.0, 1.0 };
+		
 		while (!glfwWindowShouldClose(window))
 		{
 			float deltaTime = clock() - lastFrameTime;
@@ -176,35 +183,41 @@ int main(void)
 			ImGui::NewFrame();
 
 			{
-				static float f = 0.0f;
-				static int counter = 0;
+				ImGui::Begin("Controls");
+			
+				ImGui::BeginGroup();
 
-				ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+				ImGui::Text("Cube Transform");
+				ImGui::InputFloat3("Position", matrixTranslation, 3);
+				ImGui::InputFloat3("Rotation", matrixRotation, 3);
+				ImGui::InputFloat3("Scale", matrixScale, 3);
+				ImGui::EndGroup();
 
-				ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-				ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-				ImGui::Checkbox("Another Window", &show_another_window);
+				ImGui::Separator();
 
-				ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-				ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+				ImGui::Text("Camera");
+				ImGui::SliderFloat("FOV", &fov, 45.0f, 120.0f);
+				ImGui::Text("Clipping Planes: ");
+				ImGui::InputFloat("Near", &nearClippingPlane);
+				ImGui::InputFloat("Far", &farClippingPlane);
 
-				if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-					counter++;
-				ImGui::SameLine();
-				ImGui::Text("counter = %d", counter);
-
-				ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 				ImGui::End();
 			}
-			
-			//float fov = PingPongValue(45.0f, 120.0f, deltaTime());
-			fovPingPong.step();
-			float fov = (float)fovPingPong.value;
-			glm::mat4 projection = glm::perspective(glm::radians(fov), 1.0f * (float)ResolutionX / (float)ResolutionY, 0.1f, 50.0f); //world2screen matrix
-			glm::mat4 view = glm::lookAt(glm::vec3(0.0, 2.0, 0.0), pos, glm::vec3(0.0, 1.0, 0.0)); //camera matrix
-			glm::mat4 model = glm::translate(glm::mat4(1.0f), pos); //object matrix
+			angle = matrixRotation[1];
+			angle += deltaTime * rotationSpeed;
+			matrixRotation[1] = angle;
 
-			angle += deltaTime* rotationSpeed;
+			glm::vec3 pos = glm::vec3(matrixTranslation[0], matrixTranslation[1], matrixTranslation[2]);
+			glm::vec3 rot = glm::vec3(matrixRotation[0], matrixRotation[1], matrixRotation[2]);
+			glm::vec3 scale = glm::vec3(matrixScale[0], matrixScale[1], matrixScale[2]);
+
+			glm::mat4 projection = glm::perspective(glm::radians(fov), 1.0f * (float)ResolutionX / (float)ResolutionY, nearClippingPlane, farClippingPlane); //world2screen matrix
+			glm::mat4 view = glm::lookAt(glm::vec3(0.0, 2.0, 0.0), pos, glm::vec3(0.0, 1.0, 0.0)); //camera matrix
+
+			glm::mat4 model = glm::mat4(1.0f); //object matrix
+			model = glm::translate(model, pos); 
+			model = glm::scale(model, scale);
+
 			glm::vec3 axis_y(0, 1, 0);
 
 			glm::mat4 modelRotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(angle), axis_y);
