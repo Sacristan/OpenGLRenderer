@@ -82,6 +82,10 @@ GLuint cube_indices[] = {
 	6, 7, 3
 };
 
+const glm::vec3 axis_x(1, 0, 0);
+const glm::vec3 axis_y(0, 1, 0);
+const glm::vec3 axis_z(0, 0, 1);
+
 int main(void)
 {
 	GLFWwindow* window;
@@ -154,10 +158,8 @@ int main(void)
 		IMGUI_CHECKVERSION();
 		
 		ImGui::CreateContext();
-		//// Setup Dear ImGui style
 		ImGui::StyleColorsDark();
 
-		//// Setup Platform/Renderer bindings
 		ImGui_ImplGlfw_InitForOpenGL(window, true);
 		ImGui_ImplOpenGL3_Init("#version 130");
 
@@ -203,6 +205,7 @@ int main(void)
 
 				ImGui::End();
 			}
+
 			angle = matrixRotation[1];
 			angle += deltaTime * rotationSpeed;
 			matrixRotation[1] = angle;
@@ -218,12 +221,11 @@ int main(void)
 			model = glm::translate(model, pos); 
 			model = glm::scale(model, scale);
 
-			glm::vec3 axis_y(0, 1, 0);
+			model = glm::rotate(model, glm::radians(rot.x), axis_x);
+			model = glm::rotate(model, glm::radians(rot.y), axis_y);
+			model = glm::rotate(model, glm::radians(rot.z), axis_z);
 
-			glm::mat4 modelRotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(angle), axis_y);
-			//glm::mat4 rotationMatrix = glm::mat4(1.0f);
-
-			glm::mat4 mvp = projection * view * model * modelRotationMatrix;
+			glm::mat4 mvp = projection * view * model;
 
 			shader.Bind();
 			shader.SetUniform4f("_Color", r, 0.25f, 1.0f, 1.0f);
@@ -238,7 +240,6 @@ int main(void)
 			else if (r < 0.05f) increment = abs(increment);
 
 			r += increment;
-			//r = sin(clock());
 
 			ImGui::Render();
 			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
